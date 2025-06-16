@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manual de Sobrevivência - Project Zomboid</title>
+  <style>
+    body {
+      background-color: #1a1a1a;
+      color: #f8f8f8;
+      font-family: 'Courier New', monospace;
+      padding: 20px;
+    }
+    h1, h2 {
+      color: #c0392b;
+    }
+    .quiz-container {
+      margin-bottom: 40px;
+      border-bottom: 1px dashed #555;
+      padding-bottom: 20px;
+    }
+    .question {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    .buttons {
+      margin-bottom: 10px;
+    }
+    button {
+      background-color: #333;
+      color: #f1f1f1;
+      border: 1px solid #555;
+      padding: 8px 15px;
+      margin: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #444;
+    }
+    .feedback {
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #888;
+      background-color: #222;
+      display: none;
+    }
+    #final-section {
+      margin-top: 50px;
+      border-top: 2px solid #444;
+      padding-top: 20px;
+    }
+    input[type="text"] {
+      padding: 8px;
+      font-size: 1em;
+      width: 250px;
+      background-color: #2c2c2c;
+      color: #fff;
+      border: 1px solid #555;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🧟 Manual de Sobrevivência – Missão: Verdade ou Mentira</h1>
+  <p>Atenção, sobrevivente! Sua missão é descobrir o que é fato ou invenção da mente misteriosa da Beatriz. Cuidado com as armadilhas!</p>
+
+  <div id="quiz"></div>
+
+  <div id="final-section">
+    <h2>Missão Final: Código Secreto</h2>
+    <p>Digite o código para desbloquear a mensagem final:</p>
+    <input type="text" id="codigo" placeholder="Digite aqui..." />
+    <button onclick="verificarCodigo()">Verificar</button>
+    <div id="mensagemFinal" class="feedback"></div>
+  </div>
+
+  <script>
+    const perguntas = [
+      {
+        texto: "Eu já fui arranhada na perna por um gato quando tinha (Mais ou menos) 7 anos e por isso eu não curto gatos.",
+        correta: "Mentira",
+        acerto: "Muito bem, eu só não gosto de gatos mesmo, com exceção de você rs.",
+        erro: "Nada disso, amor. Não teve história nenhuma, eu só sou anti-gatos mesmo (com exceção de você)."
+      },
+      {
+        texto: "Eu já tive um dente de leite arrancado por um soco do meu irmão.",
+        correta: "Verdade",
+        acerto: "Pois é, meu bem. Uma vez brincando de lutinha na cama, ele me deu um soco e meu dente de leite voou.",
+        erro: "Não, amor, essa é verdade mesmo. Uma vez brincando de lutinha na cama, ele me deu um soco e meu dente de leite voou."
+      },
+      {
+        texto: "Eu já rolei a escada de cimento que tinha na minha casa (com um velocípede) e saí sem nenhum arranhão.",
+        correta: "Verdade",
+        acerto: "Pois é, como a boa estabanada que sou, eu rolei escada abaixo, mas Papai do céu me protegeu kkkkkkkk",
+        erro: "Pois é, como a boa estabanada que sou, eu rolei escada abaixo, mas Papai do céu me protegeu kkkkkkkk"
+      },
+      {
+        texto: "Eu já luxei o pé, quando criança, pois estava andando na 'garupa' da bicicleta com Carlinhos e acabei colocando o pé no pneu e luxou.",
+        correta: "Mentira",
+        acerto: "Essa história é mentira porque quem realmente passou por isso foi meu irmão Gabriel risus. Nunca luxei e nem quebrei nada.",
+        erro: "Essa história é mentira porque quem realmente passou por isso foi meu irmão Gabriel risus. Nunca luxei e nem quebrei nada."
+      },
+      {
+        texto: "Eu tenho muito medo e trauma do filme 'O garoto do pijama listrado', de maneira que não consigo nem olhar para a televisão se estiver passando.",
+        correta: "Verdade",
+        acerto: "Essa é verdade. Quando eu era criança eu vi com minha mãe e Matheus e eu fiquei muito impressionada, pois o enredo é sobre os judeus e o protagonista é uma criança, então me marcou muito ver ele morrendo no campo de concentração. Não consigo ver o filme. Só de pensar me dá mal estar.",
+        erro: "Essa é verdade. Quando eu era criança eu vi com minha mãe e Matheus e eu fiquei muito impressionada, pois o enredo é sobre os judeus e o protagonista é uma criança, então me marcou muito ver ele morrendo no campo de concentração. Não consigo ver o filme. Só de pensar me dá mal estar."
+      },
+      {
+        texto: "Eu sou completamente apaixonada por você.",
+        correta: "Verdade",
+        acerto: "Essa é a mais pura verdade. Te amo, meu bem. Faltam 4 dias.",
+        erro: "Essa é a mais pura verdade. Te amo, meu bem. Faltam 4 dias."
+      }
+    ];
+
+    const quizDiv = document.getElementById("quiz");
+
+    perguntas.forEach((pergunta, index) => {
+      const container = document.createElement("div");
+      container.className = "quiz-container";
+
+      const enunciado = document.createElement("p");
+      enunciado.className = "question";
+      enunciado.innerText = pergunta.texto;
+
+      const botoes = document.createElement("div");
+      botoes.className = "buttons";
+
+      const btnVerdade = document.createElement("button");
+      btnVerdade.innerText = "Verdade";
+      const btnMentira = document.createElement("button");
+      btnMentira.innerText = "Mentira";
+
+      const feedback = document.createElement("div");
+      feedback.className = "feedback";
+      feedback.id = `feedback-${index}`;
+
+      btnVerdade.onclick = () => responder(index, "Verdade");
+      btnMentira.onclick = () => responder(index, "Mentira");
+
+      botoes.appendChild(btnVerdade);
+      botoes.appendChild(btnMentira);
+
+      container.appendChild(enunciado);
+      container.appendChild(botoes);
+      container.appendChild(feedback);
+
+      quizDiv.appendChild(container);
+    });
+
+    function responder(index, resposta) {
+      const pergunta = perguntas[index];
+      const feedback = document.getElementById(`feedback-${index}`);
+      feedback.style.display = "block";
+      if (resposta === pergunta.correta) {
+        feedback.innerText = pergunta.acerto;
+        feedback.style.borderColor = "#2ecc71";
+      } else {
+        feedback.innerText = pergunta.erro;
+        feedback.style.borderColor = "#e74c3c";
+      }
+    }
+
+    function verificarCodigo() {
+      const codigoDigitado = document.getElementById("codigo").value.toLowerCase().trim();
+      const correto = "project zomboid";
+      const mensagem = document.getElementById("mensagemFinal");
+
+      if (codigoDigitado === correto.toLowerCase()) {
+        mensagem.innerText = "Meu bem, faltam apenas 4 dias. Espero que tenha gostado do presente de hoje, que foi mais uma brincadeirinha. Te amo, meu amor.";
+        mensagem.style.borderColor = "#2ecc71";
+      } else {
+        mensagem.innerText = "Primeiro jogo que jogamos juntos.";
+        mensagem.style.borderColor = "#e67e22";
+      }
+
+      mensagem.style.display = "block";
+    }
+  </script>
+</body>
+</html>
